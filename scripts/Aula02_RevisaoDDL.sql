@@ -73,4 +73,25 @@ on update cascade;
 
 -- TO DO: adicionar restrições FK para cfp_supervisor e cpf_gerente
 
+/*
+Cria uma chave estrangeira que se relaciona
+com a chave primária da própria tabela gerando 
+um auto relacionamento
+*/
 
+alter table funcionario
+add constraint funcionario_cpf_supervisor_fk
+foreign key(cpf_supervisor)
+references funcionario(cpf)
+on delete set null
+on update cascade;
+
+/*
+Regra que permite saber qual é o funcionário
+que é gerente de um departamento
+*/
+alter table departamento
+add constraint departamento_cpf_gerente_fk
+foreign key(cpf_gerente) references funcionario(cpf)
+on delete set null
+on update cascade
