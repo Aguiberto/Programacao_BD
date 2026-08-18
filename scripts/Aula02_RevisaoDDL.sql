@@ -25,6 +25,7 @@ create table departamento(
     numero smallint primary key,
     nome varchar(50) unique,
     cpf_gerente char(11)
+    -- data_ini date not null 
 
 );
 
@@ -37,16 +38,16 @@ alter table departamento
 alter column data_ini set not null;
 
 -- Removendo um atributo
-alter table departamento
-drop column data_ini;
+-- alter table departamento
+-- drop column data_ini;
 
 -- Adicionando um valor PADRÃO
 alter table funcionario
 alter column endereco set default 'Macau-RN';
 
 -- Excluir um valor PADRÃO
-alter table funcionario
-alter column endereco drop default;
+-- alter table funcionario
+-- alter column endereco drop default;
 
 -- Adicionar restrição (constraint) CHECK
 alter table funcionario
@@ -60,8 +61,8 @@ o banco não permite o armazenamento desse dado
 */
 
 -- Excluir uma restrição
-alter table funcionario
-drop constraint if exists funcionario_sexo_check;
+-- alter table funcionario
+-- drop constraint if exists funcionario_sexo_check;
 
 -- Adicionar restrição FOREING KEY
 alter table funcionario 
