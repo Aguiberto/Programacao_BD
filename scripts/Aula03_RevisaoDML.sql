@@ -25,15 +25,15 @@ returning cpf, pnome, unome, salario;
 -- REMOVER
 -- recomendados usar sempre a chave primaria para a busca(WHERE)
 
-delete from funcionario
-where cpf = '11122233345'
-returning cpf, pnome, unome;
+-- delete from funcionario
+-- where cpf = '11122233345'
+-- returning cpf, pnome, unome;
 
 -- Cria os departamentos
 insert into departamento values
 (1,'TI','11122233345', current_date),
 (2,'Financeiro','23142543908', current_date - interval '3 days'),
-(2,'RH','23164587953', current_date - interval '5 days');
+(3,'RH','23164587953', current_date - interval '5 days');
 
 -- CRIA um SUPERVISOR 
 /*Confere valor ao atributo cpf_supervisor de todas as colunas 
@@ -41,7 +41,7 @@ usando a chave primaria de um funcionário, TODOS OS FUNCIONARIOS
 TERÃO O MESMO SUPERVISOR com excessão '<>' do que tem o cpf do supervisor*/
 update funcionario
 set cpf_supervisor='11122233345'
-where cpf <> '11122233345'
+where cpf <> '11122233345';
 
 /*Adiciona os funcionários com os cpf informados
 ao departamento 1*/
@@ -51,8 +51,8 @@ where cpf in ('11122233345','23142543908');
 
 update funcionario
 set numero_departamento = 2
-where cpf in '23164587953';
+where cpf in ('23164587953');
 
 update funcionario
 set numero_departamento = 3
-where cpf in '44455566677'
+where cpf in ('44455566677');

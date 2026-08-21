@@ -24,7 +24,7 @@ create table departamento(
 
     numero smallint primary key,
     nome varchar(50) unique,
-    cpf_gerente char(11)
+    cpf_gerente char(11),
     data_ini date not null 
 
 );
