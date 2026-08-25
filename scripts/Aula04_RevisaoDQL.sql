@@ -65,3 +65,100 @@ select message from t;
 -- "escape é para anular o caractere especial tornando-o como um caractere comum"
 select * from t
 where message like '%10$%%' escape '$';
+
+
+/*
+    Aula 25/08
+*/
+
+-- ORDENAÇÃO
+-- order by, limit
+
+-- ordenação alfabetica crescente
+select pnome, unome from funcionario
+order by pnome, unome asc;
+
+-- ordenação alfabetica decrescente
+select pnome, unome from funcionario
+order by pnome desc, unome desc; 
+
+-- selecionando o maior salario
+select pnome, unome, salario from funcionario
+order by salario desc
+limit 1;
+
+-- FUNÇÕES DE AGREGAÇÃO: count, sum, avg, min, max
+
+-- conta quantos funcionario(linhas) há na tabela funcionários
+select count (*) TotalFuncionarios from funcionario;
+
+
+select count(distinct numero_departamento) from funcionario;
+
+select sum(salario) FolhaSalarial from funcionario;
+
+select sum(salario) as "Folha Salarial D1" from funcionario
+where numero_departamento = 1;
+
+select avg(salario) MediaSalarial from funcionario;
+
+select round(avg(salario),2) media_salarial from funcionario;
+
+select 
+    min(salario) menor_salario, 
+    max(salario) maior_salario 
+from funcionario;
+
+--subconsulta : uma consulta dentro da outra (no 'where' é preciso colocar os parentesis) 
+select pnome, salario from funcionario
+where salario = (
+    select min(salario) from funcionario 
+);
+
+-- funcionarios que recebem salario maior que a média
+select pnome from funcionario
+where salario >= (
+    select avg(salario) from funcionario
+);
+
+select 
+        count(*) TotalFuncionarios,
+        sum(salario) FolhaSalarial,
+        sum(salario) *0.11 folha_inss,
+        round(avg(salario),2) MediaSalarial,
+        min(salario) MenorSalario,
+        max(salario) MaiorSalario
+from funcionario;
+
+
+-- JUNÇÕES: inner join, left join, right join, full join
+-- REALIZANDO INTERSEÇÕES
+
+-- listar nome dos funcionarios e seus respectivos departamentos
+select 
+    f.pnome || ' ' || f.unome funcionario,
+    d.nome departamento
+from funcionario f
+join departamento d
+    on f.numero_departamento = d.numero
+order by d.nome, f.pnome;
+
+-- listar todos os funcionarios e seus respetivos supervisores
+-- SUPERVISOU FICOU DE FORA PQ SUA CHAVE ESTRAGEIRA PARA SUPERVISOR É NULL
+select
+    f.pnome || ' ' || f.unome funcionario,
+    s.pnome || ' ' || s.unome supervisores
+from funcionario f 
+join funcionario s
+    on f.cpf_supervisor = s.cpf
+order by f.pnome, f.unome;
+
+-- INCLUINDO O SUPERVISOR   
+-- COALESCE: se um valor for nulo substitui por um valor escolhido (alias)
+select
+    f.pnome || ' ' || f.unome funcionario,
+    coalesce(s.pnome || ' ' || s.unome, 'Null') supervisores
+from funcionario f 
+left join funcionario s
+    on f.cpf_supervisor = s.cpf
+order by s.pnome nulls last, f.pnome, f.unome;
