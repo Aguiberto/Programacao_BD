@@ -162,3 +162,103 @@ from funcionario f
 left join funcionario s
     on f.cpf_supervisor = s.cpf
 order by s.pnome nulls last, f.pnome, f.unome;
+
+/*
+LEFT JOIN e RIGHT JOIN usa a refeência da tabela que vem escrita 
+antes ou depois ( esquerda e direita)
+*/
+
+
+update funcionario
+set numero_departamento = null
+where cpf = '11122233345';
+
+insert into departamento(numero, nome, cpf_gerente, data_ini)
+values (4,'Marketing',null,current_date);
+
+select
+    coalesce(d.nome, 'Sem departamento') departamento,
+    coalesce(f.pnome || ' ' || f.unome, 'Sem funcionario') funcionario
+from departamento d 
+full join funcionario f 
+    on d.numero = f.numero_departamento
+order by departamento nulls last, funcionario nulls last;
+
+-- EXISTS, NOT EXIST
+
+-- listar funcionarios que são gerentes de algum departamento
+-- exits para executar uma subconsulta
+select f.pnome || ' ' || f.unome funcionario
+from funcionario f
+where exists (
+    select * from departamento d
+    where d.cpf_gerente = f.cpf
+)
+order by funcionario;
+
+-- existe algum funcionario que não é gerete
+select f.pnome || ' ' || f.unome funcionario
+from funcionario f
+where not exists (
+    select * from departamento d
+    where d.cpf_gerente = f.cpf
+)
+order by funcionario;
+
+--  FUNÇÕES DE AGRUPAMENTO: group by, having
+
+-- Qual é o salário medio dos funcionario em cada departamento?
+select 
+    numero_departamento,
+    round(avg(salario), 2) media_salarial
+from funcionario
+group by numero_departamento
+order by numero_departamento;
+
+-- Qual é o salário medio dos funcionario em cada departamento (sem valores nulos)?
+select 
+    numero_departamento,
+    round(avg(salario), 2) media_salarial
+from funcionario
+where numero_departamento is not null
+-- para sql quando se trata de valores nulos deve se usar o "is" ou "is not"
+group by numero_departamento
+order by numero_departamento;
+
+-- Qual é o salário medio dos funcionario em cada departamento (sem valores nulos) USANDO HAVING?
+select 
+    numero_departamento,
+    round(avg(salario), 2) media_salarial
+from funcionario
+group by numero_departamento
+having numero_departamento is not null
+order by numero_departamento;
+
+-- Qual é o numero de funcionario que trabalham em cada departamento?
+
+select
+    numero_departamento,
+    count(*) qtd_funcionarios
+from funcionario f 
+group by numero_departamento
+order by numero_departamento;
+
+/*
+    LISTAR: numero e nome do departamento, quantidade de funcionários,
+            média salarial e folha salarial
+*/
+
+select
+    d.numero numero_departamento,
+    d.nome nome_departamento,
+    count(f.cpf) qtd_funcionarios,
+    round(avg(f.salario),2) media_salarial,
+    sum(f.salario) folha_salarial
+from funcionario f
+right join departamento d
+    on f.numero_departamento = d.numero
+group by d.numero
+order by numero_departamento;
+
+
+
