@@ -81,3 +81,24 @@ INSERT INTO orders_products (order_id, product_id, quantity, unit_price) VALUES
     (8, 6, 1,  499.90),
     (9, 3, 1,  349.90),
     (10, 1, 1, 4500.00);
+
+
+-- ===================================
+--             SOLUÇÃO                
+-- ===================================
+
+select * from products
+where price > 1000;
+
+select * from products
+order by price desc;
+
+update products
+set price = price * 1.10
+where name like '%Dell%';
+
+delete from products
+where name like '%Macbook%';
+
+delete from products
+where id not in (select product_id from orders_products);
