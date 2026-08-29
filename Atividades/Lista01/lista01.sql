@@ -83,22 +83,68 @@ INSERT INTO orders_products (order_id, product_id, quantity, unit_price) VALUES
     (10, 1, 1, 4500.00);
 
 
--- ===================================
---             SOLUÇÃO                
--- ===================================
+-- ======================================================
+--                      SOLUÇÃO                
+-- ======================================================
 
+-- mostrar os produtos com preço maior que mill
 select * from products
 where price > 1000;
 
+-- listar todos os produtos por ordem decrescente de preço
 select * from products
 order by price desc;
 
+-- aumento o preco de todos os produtos Dell em 10%
 update products
 set price = price * 1.10
 where name like '%Dell%';
 
+-- deletar todos os Macbook
 delete from products
 where name like '%Macbook%';
 
+-- deletar todos os produtos que não tiverem pedidos regristrados
 delete from products
 where id not in (select product_id from orders_products);
+
+-- mostra todos os pedidos feito nos ultimos 30 dias
+/*
+pega a data atual e subtrai 30 dias (30/07)
+pega todas as datas maior que 30/07
+*/
+select * from orders
+where order_date >= now() - interval '30 days';
+
+select 
+    u.id as id_usuario,
+    u.name as nome_usuario,
+    o.id as id_pedido,
+    p.id as id_produto,
+    p.name as nome_produto
+from users u
+left join orders o 
+    on u.id = o.user_id
+left join orders_products op 
+    on o.id = op.order_id
+full join products p 
+    on op.product_id = p.id;
+
+-- listar todos os usuário que fizeram pelo menos um pedido
+select distinct
+    u.id as id_usuario,
+    u.name as nome_usuario,
+    u.email as email
+from users u  
+join orders o  
+    on u.id = o.user_id;
+
+select
+    p.id as id_produto,
+    p.name as nome_produto
+from products p 
+left join orders_products op 
+    on p.id = op.product_id
+where op.id is null;
+
+
