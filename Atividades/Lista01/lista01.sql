@@ -204,3 +204,5 @@ select
 from users u 
 left join orders o on u.id = o.user_id
 group by u.id, u.name;
+
+-- 
