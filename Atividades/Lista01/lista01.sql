@@ -87,28 +87,28 @@ INSERT INTO orders_products (order_id, product_id, quantity, unit_price) VALUES
 --                      SOLUÇÃO                
 -- ======================================================
 
--- mostrar os produtos com preço maior que mill
+-- 1. mostrar os produtos com preço maior que mill
 select * from products
 where price > 1000;
 
--- listar todos os produtos por ordem decrescente de preço
+-- 2. listar todos os produtos por ordem decrescente de preço
 select * from products
 order by price desc;
 
--- aumento o preco de todos os produtos Dell em 10%
+-- 3. aumento o preco de todos os produtos Dell em 10%
 update products
 set price = price * 1.10
 where name like '%Dell%';
 
--- deletar todos os Macbook
+-- 4. deletar todos os Macbook
 delete from products
 where name like '%Macbook%';
 
--- deletar todos os produtos que não tiverem pedidos regristrados
+-- 5. deletar todos os produtos que não tiverem pedidos regristrados
 delete from products
 where id not in (select product_id from orders_products);
 
--- mostra todos os pedidos feito nos ultimos 30 dias
+-- 6. mostra todos os pedidos feito nos ultimos 30 dias
 /*
 pega a data atual e subtrai 30 dias (30/07)
 pega todas as datas maior que 30/07
@@ -116,6 +116,14 @@ pega todas as datas maior que 30/07
 select * from orders
 where order_date >= now() - interval '30 days';
 
+-- 7. Liste os pedidos e os respectivos nomes de usuários
+select
+    o.id as numero_pedido,
+    u.name as nome_usuario
+from orders o
+left join users u on o.user_id = u.id;
+
+-- 8. Listar todos os usuários e seus respectivos pedidos(inclusive usuários que não tem pedido)
 select 
     u.id as id_usuario,
     u.name as nome_usuario,
@@ -130,7 +138,8 @@ left join orders_products op
 full join products p 
     on op.product_id = p.id;
 
--- listar todos os usuário que fizeram pelo menos um pedido
+
+-- 9. Liste os usuário que realizaram pelo menos um pedido
 select distinct
     u.id as id_usuario,
     u.name as nome_usuario,
@@ -139,6 +148,7 @@ from users u
 join orders o  
     on u.id = o.user_id;
 
+-- 10. Listando os produtos que nunca foram vendidos
 select
     p.id as id_produto,
     p.name as nome_produto
@@ -147,4 +157,50 @@ left join orders_products op
     on p.id = op.product_id
 where op.id is null;
 
+-- 11. Liste usuários que nunca fizeram pedido
+select
+    u.name as nome_usuario,
+    u.id as id_usuario
+from users u
+left join orders on u.id = orders.user_id
+where orders.user_id is null;
 
+-- 12. Liste os produtos acima da media em ordem decrescente
+select
+    price as preço,
+    name as nome
+from products
+where price > (select avg(price) from products)
+order by price desc;
+
+-- 13. Liste a quantidade de produto pedido por cada usuário
+select
+    u.id as id_usuario,
+    u.name as nome_usuario,
+    count(o.id) as qtd_pedidos
+from users u
+left join orders o on u.id = o.user_id
+group by u.id, u.name;
+order by qtd_pedidos asc;
+
+-- 14. Listar os três(03) produtos mais vendidos
+select
+    p.id as id_produto,
+    p.name as produto,
+    sum(op.quantity) as qtd_vendas
+from products p 
+left join orders_products op on p.id = op.product_id
+group by p.id, p.name 
+order by qtd_vendas desc
+limit 3;
+
+-- 15. Gerar relatório com: usuários, quantidade de pedidos e valor total comprado.
+
+select 
+    u.id as id_usuario,
+    u.name as nome_usuario,
+    count(o.id) as qtd_pedidos,
+    sum(o.total) as preco_total
+from users u 
+left join orders o on u.id = o.user_id
+group by u.id, u.name;
