@@ -70,7 +70,70 @@ with check option;
 -- where id = 1
 
 
-update v_products_in_stock
-set estoque = 0
-where id = 1
-returning id,produto,  stock;
+-- update v_products_in_stock
+-- set estoque = 0
+-- where id = 1
+-- returning id,produto,  stock;
+
+/*
+MATERIALIZED VIEW
+*/
+
+-- 5. Relatório de produtos mais vendidos
+drop view if exists v_top_products;
+create view v_top_produtcs as
+select
+    p.id id,
+    p.name produto,
+    sum(op.quantity) unid_vendidas,
+    sum(op.quantity * op.unit_price) total_vendido
+from products p 
+join orders_products op on op.product_id = p.id 
+join orders o on o.id = op.order_id
+where o.status <> 'canceled'
+group by p.id, p.name;
+
+-- explain analyze select * from v_top_products order by total_vendido desc limit 3;
+
+-- 1º MATERIALIZED VIEW
+drop view if exists mv_top_products;
+create materialized view mv_top_produtcs as
+select
+    p.id id,
+    p.name produto,
+    sum(op.quantity) unid_vendidas,
+    sum(op.quantity * op.unit_price) total_vendido
+from products p 
+join orders_products op on op.product_id = p.id 
+join orders o on o.id = op.order_id
+where o.status <> 'canceled'
+group by p.id, p.name;
+-- with data; -- por padrão
+-- with no data; inicia sem dados
+
+-- explain analyze select * from mv_top_products order by total_vendido desc limit 3;
+
+
+-- 6. MV mostrar o total vendido por mês
+drop materialized view if exists mv_monthly_sales;
+create materialized view mv_monthly_sales as
+select
+    to_char(date_trunc('month',order_date), 'yyy-mm') mes,
+    sum(o.total) total_vendido
+from orders o 
+where o.status <> 'canceled'
+group by mes
+with no data; 
+
+-- select * from mv_monthly_sales order by mes desc;
+
+-- Recarregando a MV
+refresh materialized view mv_monthly_sales;
+
+create unique index idx_mv_mothly_sales_month
+on mv_monthly_sales(mes);
+
+-- permite consultas ...
+refresh materialized view concurrently mv_monthly_sales;
+
+
