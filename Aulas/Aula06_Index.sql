@@ -1,8 +1,8 @@
 select
-    schemanema;
+    schemaname,
     tablename,
     indexname,
-    indexdef,
+    indexdef
 from pg_indexes
 where tablename = 'address'
 order by tablename, indexname;
@@ -22,7 +22,7 @@ select
     district,
     phone
 from address
-where phone '223664661973';
+where phone = '223664661973';
 
 
 drop index if exists idx_address_phone;
@@ -39,5 +39,46 @@ create index idx_address_phone on address(phone);
 --    Index Cond: ((phone)::text = '223664661973'::text)
 --  Planning Time: 0.081 ms
 --  Execution Time: 0.040 ms
+
+-- busca textual
+explain analyze
+select
+    customer_id,
+    first_name,
+    last_name
+from customer
+where
+    last_name = 'Purdy';
+
+drop index if exists idx_customer_last_name;
+create index idx_customer_last_name on customer (lower(last_name));
+
+explain analyze
+select
+    customer_id,
+    first_name,
+    last_name
+from customer
+where
+    lower(last_name) = 'purdy';
+
+-- ÍNDICES PARCIAIS
+drop index if exists idx_customer_active;
+creat index idx_customer_active on customer(active) where active = 0;
+
+explain analyze
+select
+    customer_id,
+    active
+from 
+    customer
+where   
+    active = 0;
+
+
+
+
+--  ====================== AULA 15/09 =============================
+
 
 

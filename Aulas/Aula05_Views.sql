@@ -2,7 +2,7 @@
 drop view if exists v_users_orders;
 create view v_users_orders as 
 select 
-    u.id as id_usuario,
+    u.id as id,
     u.name as nome_usuario,
     count(o.id) as qtd_pedidos,
     sum(o.total) as preco_total
@@ -26,7 +26,7 @@ join orders o on o.id = op.order_id
 where o.status <> 'canceled'
 group by p.id, p.name;
 
--- select * from  v_produts_sale order by id;
+-- select * from  v_products_sales order by id_produto;
 
 -- 3. Relatório detalhado dos pedidos 
 drop view if exists v_orders_details;
@@ -46,7 +46,7 @@ join users u on u.id = o.user_id
 join orders_products op on op.order_id = o.id
 join products p on p.id = op.product_id;
 
--- select * from v_orders_datails order by id;
+-- select * from v_orders_details order by id;
 
 -- 4. relatorio de itens em estoque
 drop view if exists v_products_in_stock;
@@ -75,13 +75,16 @@ with check option;
 -- where id = 1
 -- returning id,produto,  stock;
 
+-- insert into v_products_in_stock(produto, valor, estoque)
+-- valies('Produto qualquer', 99, 0);
+
 /*
 MATERIALIZED VIEW
 */
 
 -- 5. Relatório de produtos mais vendidos
 drop view if exists v_top_products;
-create view v_top_produtcs as
+create view v_top_products as
 select
     p.id id,
     p.name produto,
@@ -113,12 +116,11 @@ group by p.id, p.name;
 
 -- explain analyze select * from mv_top_products order by total_vendido desc limit 3;
 
-
 -- 6. MV mostrar o total vendido por mês
 drop materialized view if exists mv_monthly_sales;
 create materialized view mv_monthly_sales as
 select
-    to_char(date_trunc('month',order_date), 'yyy-mm') mes,
+    to_char(date_trunc('month',o.order_date), 'YYY-MM') mes,
     sum(o.total) total_vendido
 from orders o 
 where o.status <> 'canceled'

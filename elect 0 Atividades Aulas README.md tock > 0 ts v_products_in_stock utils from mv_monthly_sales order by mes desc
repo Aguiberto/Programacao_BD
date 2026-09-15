@@ -1,0 +1,11 @@
+              List of relations
+ Schema |        Name         | Type | Owner 
+--------+---------------------+------+-------
+ public | v_orders_details    | view | admin
+ public | v_products_in_stock | view | admin
+ public | v_products_sales    | view | admin
+ public | v_top_products      | view | admin
+ public | v_top_produtcs      | view | admin
+ public | v_users_orders      | view | admin
+(6 rows)
+

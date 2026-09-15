@@ -1,0 +1,17 @@
+ id |   usuario    |      email      |          order_date           |  status   |           produto           | qtd | valor_unitatio | valor_total 
+----+--------------+-----------------+-------------------------------+-----------+-----------------------------+-----+----------------+-------------
+  1 | Ana Souza    | ana@tads.ifrn   | 2026-09-13 20:19:32.111569+00 | delivered | Notebook Dell Inspiron      |   1 |        4500.00 |     4500.00
+  1 | Ana Souza    | ana@tads.ifrn   | 2026-09-13 20:19:32.111569+00 | delivered | Mouse Logitech MX           |   1 |          89.90 |       89.90
+  2 | Bruno Lima   | bruno@tads.ifrn | 2026-09-10 20:19:32.111569+00 | shipped   | Teclado Mecânico Logitech   |   1 |         349.90 |      349.90
+  3 | Carla Alves  | carla@tads.ifrn | 2026-09-05 20:19:32.111569+00 | paid      | Webcam HD Logitech          |   1 |         259.00 |      259.00
+  3 | Carla Alves  | carla@tads.ifrn | 2026-09-05 20:19:32.111569+00 | paid      | Teclado Mecânico Logitech   |   1 |         349.90 |      349.90
+  3 | Carla Alves  | carla@tads.ifrn | 2026-09-05 20:19:32.111569+00 | paid      | Mouse Logitech MX           |   1 |          89.90 |       89.90
+  4 | Ana Souza    | ana@tads.ifrn   | 2026-08-31 20:19:32.111569+00 | delivered | Cadeira Ergonômica Flexform |   1 |        1299.00 |     1299.00
+  5 | Diego Santos | diego@tads.ifrn | 2026-08-26 20:19:32.111569+00 | paid      | SSD 1TB Kingston            |   1 |         459.00 |      459.00
+  6 | Elisa Prado  | elisa@tads.ifrn | 2026-08-21 20:19:32.111569+00 | pending   | Webcam HD Logitech          |   1 |         259.00 |      259.00
+  7 | Bruno Lima   | bruno@tads.ifrn | 2026-08-06 20:19:32.111569+00 | delivered | Monitor 27" Dell            |   1 |        1899.00 |     1899.00
+  8 | Carla Alves  | carla@tads.ifrn | 2026-07-27 20:19:32.111569+00 | canceled  | Headset Gamer Logitech      |   1 |         499.90 |      499.90
+  9 | Diego Santos | diego@tads.ifrn | 2026-07-17 20:19:32.111569+00 | delivered | Teclado Mecânico Logitech   |   1 |         349.90 |      349.90
+ 10 | Elisa Prado  | elisa@tads.ifrn | 2026-06-17 20:19:32.111569+00 | delivered | Notebook Dell Inspiron      |   1 |        4500.00 |     4500.00
+(13 rows)
+
