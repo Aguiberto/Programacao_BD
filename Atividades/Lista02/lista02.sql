@@ -107,3 +107,109 @@ Planning Time: 3.058 ms
 --QUESTÃO 5
 CREATE INDEX idx_customer_payment_date
 on payment(customer_id, payment_date DESC);
+
+/*
+customer_id primeiro reflete os os sistema reais, além disso a busca se torna mais eficiente
+visto que o filtro será iniciado da esquerda para a direita. Outra vantagem é que dessa forma
+uma busca usando apenas o customer_id ainda funcionará.
+*/
+
+-- QUESTÃO 6 : Expression Index
+CREATE INDEX idx_customer_email
+on customer (lower(email));
+
+explain analyze
+select
+    customer_id,
+    first_name,
+    last_name,
+    email
+from customer
+where lower(email) = lower('MARY.smith@sakilacustomer.org');
+
+/*
+
+   ->  Bitmap Index Scan on idx_customer_email  (cost=0.00..4.30 rows=3 width=0) (actual time=0.089..0.089 rows=1.00 loops=1)
+         Index Cond: (lower((email)::text) = 'mary.smith@sakilacustomer.org'::text)
+         Index Searches: 1
+         Buffers: shared read=2
+
+*/
+
+-- QUESTÃO 07: TRIGGER BEFORE INSERT OR UPDATE
+create or replace function fn_rental_date_validation()
+returns trigger as $$
+begin
+
+    if new.return_date is not null and new.return_date < new.rental_date then
+        raise exception 'Erro de validação: A data de devolução (%) não pode ser anterior a data de locação (%).',
+            new.return_date, new.rental_date;
+    end if;
+    return new;
+end; 
+$$ language plpgsql;
+
+-- TRIGGER
+create trigger trg_check_rental_dates
+before insert or update on rental -- event
+for each row
+execute function fn_rental_date_validation(); -- action
+
+-- TESTE DE FALHA
+INSERT INTO rental (rental_date, return_date, inventory_id, customer_id, staff_id)
+VALUES (
+    '2026-10-07 10:00:00', 
+    '2026-10-06 08:00:00', 
+    1, 
+    1, 
+    1
+);
+
+-- TESTE POSITIVO
+INSERT INTO rental (rental_date, return_date, inventory_id, customer_id, staff_id)
+VALUES (
+    '2026-10-07 10:00:00', 
+    '2026-10-08 14:00:00', 
+    1, 
+    1, 
+    1
+);
+
+
+-- QUESTÃO 8: TRIGGER AFTER UPDATE
+
+create table film_cost_audit(
+    audit_id serial primary key,
+    film_id int not null,
+    old_cost numeric(5,2),
+    new_cost numeric(5,2),
+    changed_at timestamp default current_timestamp
+    );
+
+create or replace function fn_audit_film()
+returns trigger as $$
+begin
+    insert into film_cost_audit(film_id, old_cost, new_cost, changed_at)
+    values(old.film_id, old.replacement_cost, new.replacement_cost, now());
+    return new;
+
+end;
+$$ language plpgsql;
+
+create trigger tgr_audit_replacement_cost
+after update on film           -- event
+for each row 
+when(old.replacement_cost is distinct from new.replacement_cost)  --condition
+execute function fn_audit_film();        -- action
+
+-- film teste 1
+set replacement_cost = 25.99
+where film_id = 1;
+
+-- teste 2
+update film
+set title = 'ACADEMY DINOSAUR REVISED'
+where film_id = 1;
+
+select * from film_cost_audit;
+
