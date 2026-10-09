@@ -213,3 +213,34 @@ where film_id = 1;
 
 select * from film_cost_audit;
 
+-- Questão 09: Trigger before delete
+
+-- função
+create or replace function fn_delete_condition()
+returns trigger as $$
+declare
+    v_qtd_films int;
+begin
+    select count(*) into v_qtd_films
+    from film
+    where language_id = old.language_id;
+
+    if v_qtd_films > 0 then
+        raise exception 'Não é possível excluir o idioma "%" (ID%) pois existem % filmes viculados a ele.',
+            old.name, old.language_id, v_qtd_films;
+    end if;
+
+    return old;
+
+end;
+$$ language plpgsql;
+
+-- trigger
+create or replace trigger trg_protect_condition
+before delete on language
+for each row
+execute function fn_delete_condition();
+
+-- teste
+delete from language
+where language_id = 1;
