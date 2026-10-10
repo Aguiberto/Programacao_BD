@@ -244,3 +244,41 @@ execute function fn_delete_condition();
 -- teste
 delete from language
 where language_id = 1;
+
+-- QUESTÃO 10: 
+
+create table customer_rental_stats (
+    customer_id int primary key,
+    total_rentals int default 0
+);
+
+insert into customer_rental_stats(customer_id, total_rentals)
+select customer_id, count(*)
+from rental 
+group by customer_id;
+
+create or replace function fn_increment_customer_rentals()
+returns trigger as $$
+begin
+
+    insert into customer_rental_stats(customer_id, total_rentals)
+    VALUES(new.customer_id,1)
+    on conflict(customer_id)
+    do update set total_rentals = customer_rental_stats.total_rentals+1;
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger trg_after_insert_rental
+after insert on rental
+for each row
+execute function fn_increment_customer_rentals();
+
+-- teste
+select * from customer_rental_stats
+where customer_id = 1;
+
+insert into rental (rental_date, inventory_id, customer_id,staff_id)
+values(now(),1,1,1);
+
+select * from customer_rental_stats where customer_id = 1;
