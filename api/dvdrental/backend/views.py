@@ -1,7 +1,9 @@
 from rest_framework import mixins, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from . import serializers
-from . import models
+from . import models, services
 
 
 class ReadOnlyListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -37,6 +39,14 @@ class CustomerViewSet(ReadOnlyListViewSet):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerSerializer
 
+    # detail = true : ação é aplicada a um único objeto
+    # api/customer/{pk}/url/url_path
+    @action(detail=True, methods=["get"], url_path="total-spent")
+    def total_spent(self, request, pk=None):
+        customer = self.get_object()
+        total_spent = services.customer_total_spent(customer.customer_id)
+        
+        return Response({"customer_id": customer.customer_id, "total_spent": total_spent})
 
 class CustomerSpendingViewSet(ReadOnlyListViewSet):
     queryset = models.CustomerSpending.objects.all()
@@ -46,6 +56,11 @@ class CustomerSpendingViewSet(ReadOnlyListViewSet):
 class FilmViewSet(ReadOnlyListViewSet):
     queryset = models.Film.objects.all()
     serializer_class = serializers.FilmSerializer
+
+    # api/films/by-length/?len_from=90&len_to=120
+    @action(detail= False, methods = ["get"] , url_path="by-length")
+    def by_length(self, request):
+        films = services.films_by_length(len_from, len_to)
 
 
 class FilmActorViewSet(ReadOnlyListViewSet):
