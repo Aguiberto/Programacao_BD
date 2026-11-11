@@ -57,3 +57,70 @@ select get_customer_total_spent(999);
 
 -- Função que retorna quantos filmes tem duração entre  valor A e B?
 -- Função que retorna quais filmes tem duração entre  valor A e B? retornar uma tablea
+
+
+-------------------------------------------------------------
+---------------------     PROCEDURES     --------------------
+-------------------------------------------------------------
+
+
+/*
+É como uma função pode executar um rollback e 
+não tem retorno (no entanto pode ser conter retorno usando o "inout" )
+*/
+
+drop procedure if exists register_rental_with_payment;
+create or replace procedure register_rental_with_payment(
+    p_customer_id customer.curstomer_id%TYPE,
+    p_inventory_id inventory.inventory_id%TYPE,
+    p_staff_id staff.staff id%TYPE,
+    p_amount numeric 
+language plpgpsql
+as $$
+declare 
+    v_rental_id rental.rental_id%TYPE;
+begin
+    insert into rental(
+        rental_date,
+        inventory_id,
+        staff_id
+    )
+    values(
+        now(),
+        p_inventory_id,
+        p_customer_id,
+        p_staff_id
+    );
+    insert into payment(
+        curstomer_id,
+        staff_id,
+        rental_id,
+        amount,
+        payment_date
+        
+    )
+    values(
+        p_customer_id,
+        p_staff_id,
+        v_rental_id,
+        p_amount,
+        now()
+    );
+
+    raise notice 'Aluguel % registrado!', v_rental_id;
+end;
+$$;
+
+begin;
+-- procedures são chamados com o comando call
+call register_rental_with_payment(1::smallint, 1::smallint, 1::smallint, 5.99)
+
+select from * rental where custumer_id = 1
+order by rental_id desc
+limit 1;
+
+rollback;
+
+select from * rental where custumer_id = 1
+order by rental_id desc
+limit 1;

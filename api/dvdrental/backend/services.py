@@ -18,5 +18,11 @@ def _fetch_all(query, params=None):
 def films_by_length(len_from, len_to):
     return _fetch_all(
         "select * get_film_by_length(%s::smallint, %s::smallint)",
-        [len]
+        [len_from, len_to]
     )
+
+def register_rental_with_payment(customer_id, inventory_id, staff_id, amount):
+
+    with connection.cursor() as cursor:
+        cursor.execute("call register_rental_with_payment(1::smallint, 1::smallint, 1::smallint, 5.99)
+", [customer_id, inventory_id])

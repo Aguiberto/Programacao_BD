@@ -57,10 +57,21 @@ class FilmViewSet(ReadOnlyListViewSet):
     queryset = models.Film.objects.all()
     serializer_class = serializers.FilmSerializer
 
+    def _validated_length_range(self, request):
+
+        # request.query_params contém os parâmetros enviados na URL
+        query_serializer = serializers.FilmLengthRangeSerializer(
+            data=request.query_params
+        )
+        query_serializer.is_valid(raise_exception=True)
+        return query_serializer.validate_data
+
     # api/films/by-length/?len_from=90&len_to=120
     @action(detail= False, methods = ["get"] , url_path="by-length")
     def by_length(self, request):
-        films = services.films_by_length(len_from, len_to)
+        length_range = self._validated_length_range(request)
+        films = services.films_by_length(length_range["len_from"], length_range["len_to"])
+        return Response(films)
 
 
 class FilmActorViewSet(ReadOnlyListViewSet):
@@ -92,6 +103,19 @@ class RentalViewSet(ReadOnlyListViewSet):
     queryset = models.Rental.objects.all()
     serializer_class = serializers.RentalSerializer
 
+@action(detail=False, methods=["post"], url_path="register")
+def register(self, request):
+    input_serializer = serializers.ResgisterRentalSerializer(
+        data=request.data
+    )
+
+    input_serializer.is_valid(raise_exception=True)
+
+    services.register_rental_with_payment(
+        **input_serializer.validated_date
+    )
+
+    return Response("detail":"Aluguel resgistrado!", status=201)
 
 class StaffViewSet(ReadOnlyListViewSet):
     queryset = models.Staff.objects.all()

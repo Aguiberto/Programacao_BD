@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from decimal import Decimal
 
 from .models import (
     Actor,
@@ -66,6 +67,21 @@ class FilmSerializer(serializers.ModelSerializer):
         model = Film
         fields = '__all__'
 
+class FilmLengthRangeSerializer(serializers.Serializer):
+
+    len_from = serializers.IntercerField(min_value = 0)
+    len_to = serializers.IntercerField(min_value = 0)
+
+    # validate - método que pode ser sobrescreito em um serializer 
+    # para adicionar validação personalizada
+    def validate(self, attrs):
+
+        if attrs['len_from'] > attrs['len_to']:
+            raise serializers.ValidationError(
+                {'len_to':'Deve ser maior que len_from'}
+            )
+        return attrs
+
 
 class FilmActorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -101,6 +117,19 @@ class RentalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rental
         fields = '__all__'
+
+class RegisterRentalSerializer(serializers.Serializer):
+
+    customer_id = serializers.IntergerField(min_value=1)
+    inventory_id = serializers.IntergerField(min_value=1)
+    staff_id = serializers.IntergerField(min_value=1)
+    amount = serializers.DecimalField(
+        max_digits = 5,
+        decimal_places = 2,
+        min_value = Decimal("0.01")
+        
+    )
+
 
 
 class StaffSerializer(serializers.ModelSerializer):
